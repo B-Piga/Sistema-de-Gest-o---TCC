@@ -1,0 +1,274 @@
+object Dm: TDm
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 330
+  Width = 414
+  object IBD_SgEdu: TIBDatabase
+    Connected = True
+    DatabaseName = 'C:\BVX\SGEdu\SgEdu.fdb'
+    Params.Strings = (
+      'user_name=SYSDBA'
+      'password=aivilo7')
+    LoginPrompt = False
+    DefaultTransaction = IBT_SgEdu
+    ServerType = 'IBServer'
+    SQLDialect = 1
+    Left = 40
+    Top = 11
+  end
+  object IBT_SgEdu: TIBTransaction
+    Active = True
+    DefaultDatabase = IBD_SgEdu
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait')
+    Left = 112
+    Top = 11
+  end
+  object IBQ_Pesquisa: TIBQuery
+    Database = IBD_SgEdu
+    Transaction = IBT_SgEdu
+    AfterDelete = IBQ_PesquisaAfterDelete
+    AfterEdit = IBQ_PesquisaAfterDelete
+    AfterInsert = IBQ_PesquisaAfterDelete
+    AfterOpen = IBQ_PesquisaAfterDelete
+    AfterPost = IBQ_PesquisaAfterDelete
+    AfterRefresh = IBQ_PesquisaAfterDelete
+    BufferChunks = 1000
+    CachedUpdates = False
+    ParamCheck = True
+    SQL.Strings = (
+      '')
+    Left = 40
+    Top = 66
+  end
+  object DS_Pesquisa: TDataSource
+    AutoEdit = False
+    DataSet = IBQ_Pesquisa
+    Left = 112
+    Top = 67
+  end
+  object IBQ_PesqAux: TIBQuery
+    Database = IBD_SgEdu
+    Transaction = IBT_SgEdu
+    AfterDelete = IBQ_PesquisaAfterDelete
+    AfterEdit = IBQ_PesquisaAfterDelete
+    AfterInsert = IBQ_PesquisaAfterDelete
+    AfterOpen = IBQ_PesquisaAfterDelete
+    AfterPost = IBQ_PesquisaAfterDelete
+    AfterRefresh = IBQ_PesquisaAfterDelete
+    BufferChunks = 1000
+    CachedUpdates = False
+    ParamCheck = True
+    SQL.Strings = (
+      '')
+    Left = 227
+    Top = 154
+  end
+  object DS_PesqAux: TDataSource
+    AutoEdit = False
+    DataSet = IBQ_PesqAux
+    Left = 299
+    Top = 154
+  end
+  object IBDS_Receber: TIBDataSet
+    Database = IBD_SgEdu
+    Transaction = IBT_SgEdu
+    AfterDelete = IBDS_ReceberAfterDelete
+    AfterOpen = IBDS_ReceberAfterOpen
+    AfterPost = IBDS_ReceberAfterDelete
+    BeforeEdit = IBDS_ReceberBeforeEdit
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_RECEBER ('#39'3'#39',:CODIGO,:COD_SOCIO,:DT_EMISSAO,' +
+        ':DT_VENCTO,:VLR_PARC,:VLR_ACRES,:VLR_DESC, :VLR_PAGTO,:DT_PAGTO,' +
+        ':HISTORICO,:NOSSO_NRO,:MES,:ANO)')
+    InsertSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_RECEBER ('#39'1'#39',:CODIGO,:COD_SOCIO,:DT_EMISSAO,' +
+        ':DT_VENCTO,:VLR_PARC,:VLR_ACRES,:VLR_DESC, :VLR_PAGTO,:DT_PAGTO,' +
+        ':HISTORICO,:NOSSO_NRO,:MES,:ANO)')
+    RefreshSQL.Strings = (
+      'SELECT A.*, B.NOME NOME_SOCIO'
+      'FROM RECEBER A, SOCIO B'
+      'WHERE  A.COD_SOCIO = B.CODIGO')
+    SelectSQL.Strings = (
+      'SELECT A.*, B.NOME NOME_SOCIO'
+      'FROM RECEBER A, SOCIO B'
+      'WHERE A.COD_SOCIO = B.CODIGO')
+    ModifySQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_RECEBER ('#39'2'#39',:CODIGO,:COD_SOCIO,:DT_EMISSAO,' +
+        ':DT_VENCTO,:VLR_PARC,:VLR_ACRES,:VLR_DESC, :VLR_PAGTO,:DT_PAGTO,' +
+        ':HISTORICO,:NOSSO_NRO,:MES,:ANO)')
+    ParamCheck = True
+    UniDirectional = False
+    Left = 36
+    Top = 154
+  end
+  object DS_Receber: TDataSource
+    AutoEdit = False
+    DataSet = IBDS_Receber
+    Left = 111
+    Top = 154
+  end
+  object IBDS_Socio: TIBDataSet
+    Database = IBD_SgEdu
+    Transaction = IBT_SgEdu
+    AfterDelete = IBDS_SocioAfterDelete
+    AfterOpen = IBDS_SocioAfterOpen
+    AfterPost = IBDS_SocioAfterPost
+    BeforeEdit = IBDS_SocioBeforeEdit
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_SOCIO ('#39'3'#39',:CODIGO, :NOME,:SEXO,:DT_NASC,:RG' +
+        '_IE,:CPF_CNPJ,:FLG_ATIVO,:flg_tipo,:ENDERECO,:NRO,:COMPLEMENTO,:' +
+        'BAIRRO,:CEP,:CIDADE,:UF,:FONE,:FONE1,:CELULAR,:EMAIL,:PROFISSAO,' +
+        ':EMPRESA,:VALOR,:OBSERV,:FLG_BOLETO)')
+    InsertSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_SOCIO ('#39'1'#39',:CODIGO, :NOME,:SEXO,:DT_NASC,:RG' +
+        '_IE,:CPF_CNPJ,:FLG_ATIVO,:flg_tipo,:ENDERECO,:NRO,:COMPLEMENTO,:' +
+        'BAIRRO,:CEP,:CIDADE,:UF,:FONE,:FONE1,:CELULAR,:EMAIL,:PROFISSAO,' +
+        ':EMPRESA,:VALOR,:OBSERV,:FLG_BOLETO)')
+    RefreshSQL.Strings = (
+      'SELECT * FROM SOCIO'
+      'WHERE CODIGO = :CODIGO')
+    SelectSQL.Strings = (
+      'SELECT * FROM SOCIO '
+      'WHERE CODIGO = :CODIGO')
+    ModifySQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_SOCIO ('#39'2'#39',:CODIGO, :NOME,:SEXO,:DT_NASC,:RG' +
+        '_IE,:CPF_CNPJ,:FLG_ATIVO,:flg_tipo,:ENDERECO,:NRO,:COMPLEMENTO,:' +
+        'BAIRRO,:CEP,:CIDADE,:UF,:FONE,:FONE1,:CELULAR,:EMAIL,:PROFISSAO,' +
+        ':EMPRESA,:VALOR,:OBSERV,:FLG_BOLETO)')
+    ParamCheck = True
+    UniDirectional = False
+    Left = 35
+    Top = 207
+  end
+  object DS_Socio: TDataSource
+    AutoEdit = False
+    DataSet = IBDS_Socio
+    Left = 113
+    Top = 207
+  end
+  object IBDS_Empresa: TIBDataSet
+    Database = IBD_SgEdu
+    Transaction = IBT_SgEdu
+    AfterDelete = IBDS_EmpresaAfterDelete
+    AfterOpen = IBDS_EmpresaAfterOpen
+    AfterPost = IBDS_EmpresaAfterPost
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_EMPRESA ('#39'3'#39',:CODIGO,:RAZAO_SOCIAL,:FANTASIA' +
+        ',:ENDERECO,:BAIRRO,:CIDADE,:CEP,:FONE,:FONE2,:EMAIL,:CNPJ,:IE,:N' +
+        'IVEL,:SENHAX,:SENHAY,:SENHAZ)')
+    InsertSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_EMPRESA ('#39'1'#39',:CODIGO,:RAZAO_SOCIAL,:FANTASIA' +
+        ',:ENDERECO,:BAIRRO,:CIDADE,:CEP,:FONE,:FONE2,:EMAIL,:CNPJ,:IE,:N' +
+        'IVEL,:SENHAX,:SENHAY,:SENHAZ)')
+    RefreshSQL.Strings = (
+      'SELECT * FROM EMPRESA')
+    SelectSQL.Strings = (
+      'SELECT * FROM EMPRESA')
+    ModifySQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_EMPRESA ('#39'2'#39',:CODIGO,:RAZAO_SOCIAL,:FANTASIA' +
+        ',:ENDERECO,:BAIRRO,:CIDADE,:CEP,:FONE,:FONE2,:EMAIL,:CNPJ,:IE,:N' +
+        'IVEL,:SENHAX,:SENHAY,:SENHAZ)')
+    ParamCheck = True
+    UniDirectional = False
+    Left = 224
+    Top = 207
+  end
+  object DS_Empresa: TDataSource
+    AutoEdit = False
+    DataSet = IBDS_Empresa
+    Left = 297
+    Top = 207
+  end
+  object IBD_Financ: TIBDatabase
+    Params.Strings = (
+      'user_name=SYSDBA'
+      'password=aivilo7')
+    LoginPrompt = False
+    DefaultTransaction = IBT_Financ
+    ServerType = 'IBServer'
+    Left = 234
+    Top = 10
+  end
+  object IBT_Financ: TIBTransaction
+    DefaultDatabase = IBD_Financ
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait')
+    Left = 306
+    Top = 10
+  end
+  object IBQ_PesqFinanc: TIBQuery
+    Database = IBD_Financ
+    Transaction = IBT_Financ
+    BufferChunks = 1000
+    CachedUpdates = False
+    ParamCheck = True
+    Left = 230
+    Top = 53
+  end
+  object DS_PesqFinanc: TDataSource
+    AutoEdit = False
+    DataSet = IBQ_PesqFinanc
+    Left = 311
+    Top = 53
+  end
+  object IBDS_Convenio: TIBDataSet
+    Database = IBD_SgEdu
+    Transaction = IBT_SgEdu
+    AfterDelete = IBDS_ConvenioAfterDelete
+    AfterOpen = IBDS_ConvenioAfterOpen
+    AfterPost = IBDS_ConvenioAfterPost
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_CONVENIO ('#39'3'#39',:CODIGO,:NOME,:CPF_CNPJ,:FLG_A' +
+        'TIVO,:ENDERECO,:NRO,:COMPLEMENTO,:BAIRRO,:CEP,:CIDADE,:OBSERV,:U' +
+        'F)')
+    InsertSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_CONVENIO ('#39'1'#39',:CODIGO,:NOME,:CPF_CNPJ,:FLG_A' +
+        'TIVO,:ENDERECO,:NRO,:COMPLEMENTO,:BAIRRO,:CEP,:CIDADE,:OBSERV,:U' +
+        'F)')
+    RefreshSQL.Strings = (
+      'SELECT * FROM CONVENIO'
+      'WHERE CODIGO = :CODIGO')
+    SelectSQL.Strings = (
+      'SELECT * FROM CONVENIO'
+      'WHERE CODIGO = : CODIGO')
+    ModifySQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_CONVENIO ('#39'2'#39',:CODIGO,:NOME,:CPF_CNPJ,:FLG_A' +
+        'TIVO,:ENDERECO,:NRO,:COMPLEMENTO,:BAIRRO,:CEP,:CIDADE,:OBSERV,:U' +
+        'F)')
+    ParamCheck = False
+    UniDirectional = False
+    Left = 224
+    Top = 263
+  end
+  object DS_Convenio: TDataSource
+    AutoEdit = False
+    DataSet = IBDS_Convenio
+    Left = 297
+    Top = 263
+  end
+end

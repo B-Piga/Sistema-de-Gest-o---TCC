@@ -1,0 +1,446 @@
+unit Sg0022A;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, Grids, DBGrids, StdCtrls, Buttons, Mask, DBCtrls,
+  ComCtrls, DB, IBCustomDataSet, RDprint, IBQuery;
+
+type
+  TSg_0022A = class(TForm)
+    Pan_Botao: TPanel;
+    bbtn_gerar: TBitBtn;
+    bbtn_sair: TBitBtn;
+    Pan_dados: TPanel;
+    GB_Periodo: TGroupBox;
+    MEdit_Data1: TMaskEdit;
+    MEdit_Data2: TMaskEdit;
+    GB_Cliente: TGroupBox;
+    Edit_CodCli: TEdit;
+    Edit_NomeCli: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    SB_Cliente: TSpeedButton;
+    SB_Limpa_Cli: TSpeedButton;
+    RDprint1: TRDprint;
+    IBQ_Pesquisa: TIBQuery;
+    DS_Pesquisa: TDataSource;
+    Pan_Tipo: TPanel;
+    RG_Tipo: TRadioGroup;
+    Bevel3: TBevel;
+    Pan_Relat: TPanel;
+    RG_Relat: TRadioGroup;
+    Bevel1: TBevel;
+    Bevel4: TBevel;
+    Bevel2: TBevel;
+    Pan_Periodo: TPanel;
+    RG_Periodo: TRadioGroup;
+    Pan_Filtrar: TPanel;
+    RG_Filtrar: TRadioGroup;
+    Bevel5: TBevel;
+    Bevel6: TBevel;
+    bbtn_arq: TBitBtn;
+    Panel2: TPanel;
+    Label6: TLabel;
+    GroupBox1: TGroupBox;
+    SB_Empresa: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    Edit_Empresa: TEdit;
+    procedure FormShow(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormDestroy(Sender: TObject);
+    procedure SB_Limpa_CliClick(Sender: TObject);
+    procedure bbtn_sairClick(Sender: TObject);
+    procedure MEdit_Data1KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure MEdit_Data2KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure bbtn_gerarClick(Sender: TObject);
+    procedure SB_ClienteClick(Sender: TObject);
+    procedure Edit_CodCliEnter(Sender: TObject);
+    procedure bbtn_arqClick(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure SB_EmpresaClick(Sender: TObject);
+  private
+    ComponAnt : TMaskEdit;
+    procedure ControlChange(Sender : TObject);
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Sg_0022A: TSg_0022A;
+
+implementation
+
+uses Arquivos, Sg0000, R0022A, R0022B, R0022C,
+  Sg20, Sg21;
+
+{$R *.dfm}
+
+procedure TSg_0022A.ControlChange(Sender : TObject);
+begin
+   if Assigned(ComponAnt) then ComponAnt.color  := clWhite;
+
+   if ActiveControl is TMaskEdit then
+     begin
+        TMaskEdit(ActiveControl).Color := $0080FFFF;
+        ComponAnt := TMaskEdit(ActiveControl);
+     end
+   else
+     ComponAnt := nil;
+end;
+
+procedure TSg_0022A.FormShow(Sender: TObject);
+begin
+
+    
+   Screen.OnActiveControlChange := ControlChange;
+   // Iniciliza Campos
+   SB_Limpa_Cli.Click;
+   MEdit_Data1.SetFocus;
+end;
+
+procedure TSg_0022A.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Shift = [ssAlt]) and (Key = VK_F4) then Key := VK_Clear;
+  if key = vk_return   then Perform(wm_NextDlgCtl,0,0);
+  if key = vk_escape   then Perform(wm_NextDlgCtl,1,0);
+  if key = vk_f5       then SB_Cliente.Click;
+  if key = vk_f5       then SB_Cliente.Click;
+end;
+
+procedure TSg_0022A.FormDestroy(Sender: TObject);
+begin
+   Screen.OnActiveControlChange := Nil;
+end;
+
+procedure TSg_0022A.SB_Limpa_CliClick(Sender: TObject);
+begin
+   Edit_CodCli.Text  := '000000';
+   Edit_NomeCli.Text := 'TODOS';
+end;
+
+procedure TSg_0022A.SpeedButton2Click(Sender: TObject);
+begin
+  Edit_Empresa.Text := '';
+end;
+
+procedure TSg_0022A.bbtn_sairClick(Sender: TObject);
+begin
+   Close;
+end;
+
+procedure TSg_0022A.MEdit_Data1KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if key = vk_escape then
+      bbtn_sair.SetFocus;
+
+   if key = vk_return then
+     begin
+        if MEdit_Data1.Text <> '  /  /    ' then
+          begin
+             try
+                MEdit_Data1.Text := DateToStr(StrToDate(MEdit_Data1.Text));
+                MEdit_Data2.SetFocus;
+             except
+                ShowMessage('Data Inicial Inválida!!!');
+                MEdit_Data1.SetFocus;
+             end;
+          end
+        else
+          begin
+             MEdit_Data1.Text := DateToStr(Date);
+             MEdit_Data2.SetFocus;
+          end;
+     end;
+end;
+
+procedure TSg_0022A.MEdit_Data2KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if key = vk_escape then
+      MEdit_Data1.SetFocus;
+
+   if key = vk_return then
+     begin
+        if MEdit_Data2.Text <> '  /  /    ' then
+          begin
+             try
+                MEdit_Data2.Text := DateToStr(StrToDate(MEdit_Data2.Text));
+                RG_Tipo.SetFocus;
+                Perform(wm_NextDlgCtl,0,0);
+             except
+                ShowMessage('Data Final Inválida!!!');
+                MEdit_Data2.SetFocus;
+             end;
+          end
+        else
+          begin
+             MEdit_Data2.Text := DateToStr(Date);
+             RG_Tipo.SetFocus;
+             Perform(wm_NextDlgCtl,0,0);
+          end;
+     end;
+end;
+
+procedure TSg_0022A.bbtn_gerarClick(Sender: TObject);
+begin
+   // Confirma Datas
+   if MEdit_Data1.Text = '  /  /    ' then MEdit_Data1.Text := DateToStr(Date);
+   if MEdit_Data2.Text = '  /  /    ' then MEdit_Data2.Text := DateToStr(Date);
+
+   if StrToDate(MEdit_Data1.Text) > StrToDate(MEdit_Data2.Text) then
+     begin
+        ShowMessage('Data Inicial está menor que Data Final!!!');
+        MEdit_Data1.SetFocus;
+        Exit;
+     end;
+
+   if (RG_Periodo.ItemIndex = 2) and (RG_Tipo.ItemIndex < 2) then
+     begin
+        ShowMessage('Período inválido para Tipo de Relatório!!!');
+        MEdit_Data1.SetFocus;
+        Exit;
+     end;
+
+
+   // RELATÓRIO COMPLETO
+   if RG_Relat.ItemIndex = 0 then
+     begin
+        // Se for 'Todos' ou 'a Receber'
+        if RG_Tipo.ItemIndex < 2 then
+          begin
+             R_0022A := TR_0022A.Create(self);
+             with R_0022A.IBQ_Pesquisa,SQL do
+               begin
+                  Close;
+                  Clear;
+                  Add('select a.*, b.nome nome_cli, b.fone, b.celular from receber a, socio b ');
+                  Add('where (b.codigo = a.cod_socio) ');
+                  if Edit_CodCli.Text <> '000000' then Add('and (a.cod_socio = :cod_cli) ');
+
+                  if RG_Tipo.ItemIndex    = 1 then Add('and (a.dt_pagto is null) ');
+                  if RG_Periodo.ItemIndex = 0 then Add('and (a.dt_emissao between :dt1 and :dt2) ');
+                  if RG_Periodo.ItemIndex = 1 then Add('and (a.dt_vencto  between :dt1 and :dt2) ');
+                  if RG_Filtrar.ItemIndex = 1 then Add('and (a.dt_vencto >= :data) ');
+                  if RG_Filtrar.ItemIndex = 2 then Add('and (a.dt_vencto <  :data) ');
+
+                  Add('order by b.nome, a.codigo ');
+
+                  // Parâmetros
+                  ParamByName('dt1').AsDateTime := StrToDate(MEdit_Data1.Text);
+                  ParamByName('dt2').AsDateTime := StrToDate(MEdit_Data2.Text);
+                  if (Edit_CodCli.Text <> '000000') then
+                     ParamByName('COD_CLI').AsInteger := StrToInt(Edit_CodCli.Text);
+                  if RG_Filtrar.ItemIndex > 0 then ParamByName('DATA').AsDateTime := Date;
+                  Open;
+               end;
+
+             R_0022A.QRLabel_parametro.Caption := 'Cliente: ' + Edit_CodCli.Text + ' - ' + Edit_NomeCli.Text;
+             R_0022A.QRLabel_parametro.Caption := R_0022A.QRLabel_parametro.Caption + '       -       Período: ' + MEdit_Data1.Text + ' a ' + MEdit_Data2.Text;
+             R_0022A.QRLabel_parametro.Caption := R_0022A.QRLabel_parametro.Caption + '       -       Contas: ' + Copy(RG_Tipo.Items.Strings[RG_Tipo.ItemIndex],6,10);
+
+             R_0022A.Preview;
+             R_0022A.Destroy;
+          end
+        else
+          begin
+             // Se for 'Recebidos'
+             R_0022B := TR_0022B.Create(self);
+             with R_0022B.IBQ_Pesquisa,SQL do
+               begin
+                  Close;
+                  Clear;
+                  Add('select a.*, b.nome nome_cli, b.fone, b.celular ');
+                  Add('from receber a, socio b ');
+                  Add('where (b.codigo = a.cod_socio) and (dt_pagto is not null) ');
+                  if Edit_CodCli.Text <> '000000' then Add('and (a.cod_socio = :cod_cli) ');
+
+                  if RG_Periodo.ItemIndex = 0 then Add('and (a.dt_emissao between :dt1 and :dt2) ');
+                  if RG_Periodo.ItemIndex = 1 then Add('and (a.dt_vencto  between :dt1 and :dt2) ');
+                  if RG_Periodo.ItemIndex = 2 then Add('and (a.dt_pagto   between :dt1 and :dt2) ');
+                  if RG_Filtrar.ItemIndex = 1 then Add('and (a.dt_vencto >= :data) ');
+                  if RG_Filtrar.ItemIndex = 2 then Add('and (a.dt_vencto <  :data) ');
+
+                  Add('order by b.nome ');
+
+                  // Parâmetros
+                  ParamByName('dt1').AsDateTime := StrToDate(MEdit_Data1.Text);
+                  ParamByName('dt2').AsDateTime := StrToDate(MEdit_Data2.Text);
+                  if (Edit_CodCli.Text <> '000000') then
+                     ParamByName('COD_CLI').AsInteger := StrToInt(Edit_CodCli.text);
+                  if RG_Filtrar.ItemIndex > 0 then ParamByName('DATA').AsDateTime := Date;
+                  Open;
+               end;
+
+             R_0022B.QRLabel_parametro.Caption := 'Cliente: ' + Edit_CodCli.Text + ' - ' + Edit_NomeCli.Text;
+             R_0022B.QRLabel_parametro.Caption := R_0022B.QRLabel_parametro.Caption + '       -       Período: ' + MEdit_Data1.Text + ' a ' + MEdit_Data2.Text;
+             R_0022B.QRLabel_parametro.Caption := R_0022B.QRLabel_parametro.Caption + '       -       Contas: ' + Copy(RG_Tipo.Items.Strings[RG_Tipo.ItemIndex],6,10);
+
+             R_0022B.Preview;
+             R_0022B.Destroy;
+          end;
+     end
+   else
+     begin
+        // Se for 'Todos' ou 'a Receber'
+        if RG_Tipo.ItemIndex < 2 then
+          begin
+             R_0022C := TR_0022C.Create(self);
+             with R_0022C.IBQ_Pesquisa,SQL do
+               begin
+                  Close;
+                  Clear;
+                  Add('select a.cod_socio, b.nome nome_cli, b.fone, b.celular from receber a, socio b ');
+                  Add('where (b.codigo = a.cod_socio) ');
+                  if Edit_CodCli.Text <> '000000' then Add('and (a.cod_socio = :cod_cli) ');
+
+                  if RG_Tipo.ItemIndex    = 1 then Add('and (a.dt_pagto is null) ');
+                  if RG_Periodo.ItemIndex = 0 then Add('and (a.dt_emissao between :dt1 and :dt2) ');
+                  if RG_Periodo.ItemIndex = 1 then Add('and (a.dt_vencto  between :dt1 and :dt2) ');
+                  if RG_Filtrar.ItemIndex = 1 then Add('and (a.dt_vencto >= :data) ');
+                  if RG_Filtrar.ItemIndex = 2 then Add('and (a.dt_vencto <  :data) ');
+
+                  Add('group by a.cod_socio, b.nome, b.fone, b.celular ');
+
+                  // Parâmetros
+                  ParamByName('dt1').AsDateTime  := StrToDate(MEdit_Data1.Text);
+                  ParamByName('dt2').AsDateTime  := StrToDate(MEdit_Data2.Text);
+                  if (Edit_CodCli.Text <> '000000') then
+                     ParamByName('COD_CLI').AsInteger := StrToInt(Edit_CodCli.Text);
+                  if RG_Filtrar.ItemIndex > 0 then ParamByName('DATA').AsDateTime := Date;
+                  Open;
+               end;
+
+             R_0022C.QRLabel_parametro.Caption := 'Período: ' + MEdit_Data1.Text + ' a ' + MEdit_Data2.Text;
+             R_0022C.QRLabel_parametro.Caption := R_0022C.QRLabel_parametro.Caption + '       -       Contas: ' + Copy(RG_Tipo.Items.Strings[RG_Tipo.ItemIndex],6,10);
+
+             R_0022C.Preview;
+             R_0022C.Destroy;
+          end
+        else
+          begin
+             ShowMessage('Rotina em Construção!!!');
+          end;
+     end;
+
+
+   bbtn_sair.SetFocus;
+end;
+
+procedure TSg_0022A.SB_ClienteClick(Sender: TObject);
+begin
+   Dlg_Socio.SB_Nova.Visible := False;
+   Dlg_Socio.Edit_pesquisa.Clear;
+   if Dlg_Socio.ShowModal = mrOk then
+     begin
+        Edit_CodCli.Text  := FormatFloat('000000',Dlg_Socio.SQL_Pesquisa.FieldByName('CODIGO').AsInteger);
+        Edit_NomeCli.Text := Dlg_Socio.SQL_Pesquisa.FieldByName('NOME').AsString;
+     end;
+
+   if MEdit_Data1.Text = '  /  /    ' then
+      MEdit_Data1.SetFocus
+   else
+      if MEdit_Data2.Text = '  /  /    ' then
+         MEdit_Data2.SetFocus
+      else
+         bbtn_gerar.SetFocus;
+end;
+
+procedure TSg_0022A.SB_EmpresaClick(Sender: TObject);
+begin
+   Dlg_Empresa.Edit_pesquisa.Clear;
+   if Dlg_Empresa.ShowModal = mrOk then
+     begin
+        Edit_Empresa.Text := Dlg_Empresa.SQL_Pesquisa.FieldByName('EMPRESA').AsString;
+     end;
+
+   if MEdit_Data1.Text = '  /  /    ' then
+      MEdit_Data1.SetFocus
+   else
+      if MEdit_Data2.Text = '  /  /    ' then
+         MEdit_Data2.SetFocus
+      else
+         bbtn_gerar.SetFocus;
+end;
+
+procedure TSg_0022A.Edit_CodCliEnter(Sender: TObject);
+begin
+   if MEdit_Data1.Text = '  /  /    ' then
+      MEdit_Data1.SetFocus
+   else
+      if MEdit_Data2.Text = '  /  /    ' then
+         MEdit_Data2.SetFocus
+      else
+         bbtn_gerar.SetFocus;
+end;
+
+procedure TSg_0022A.bbtn_arqClick(Sender: TObject);
+var Arq :TextFile;
+cnpj, nro, vencto, vlr_parc :String;
+begin
+  if MEdit_Data1.Text = '  /  /    ' then MEdit_Data1.Text := '01/01/2000';
+  if MEdit_Data2.Text = '  /  /    ' then MEdit_Data2.Text := DateToStr(Date);
+
+  with Dm.IBQ_Pesquisa, SQL do
+      begin
+        Close;
+        Clear;
+        Add('select b.cpf_cnpj, a.nosso_nro, a.dt_vencto, a.vlr_parc from receber a, socio b ');
+        Add('where (b.codigo = a.cod_socio) ');
+        if Edit_CodCli.Text <> '000000' then Add('and (a.cod_socio = :cod_cli) ');
+        if Edit_Empresa.Text <> ''      then Add('and (b.empresa = :empresa)');
+
+
+        if RG_Tipo.ItemIndex    = 1 then Add('and (a.dt_pagto is null) ');
+        if RG_Periodo.ItemIndex = 0 then Add('and (a.dt_emissao between :dt1 and :dt2) ');
+        if RG_Periodo.ItemIndex = 1 then Add('and (a.dt_vencto  between :dt1 and :dt2) ');
+        if RG_Filtrar.ItemIndex = 1 then Add('and (a.dt_vencto >= :data) ');
+        if RG_Filtrar.ItemIndex = 2 then Add('and (a.dt_vencto <  :data) ');
+
+        Add('group by b.cpf_cnpj, a.nosso_nro, a.dt_vencto, a.vlr_parc ');
+
+        // Parâmetros
+        ParamByName('dt1').AsDateTime  := StrToDate(MEdit_Data1.Text);
+        ParamByName('dt2').AsDateTime  := StrToDate(MEdit_Data2.Text);
+        if (Edit_CodCli.Text <> '000000') then
+          ParamByName('COD_CLI').AsInteger := StrToInt(Edit_CodCli.Text);
+        if RG_Filtrar.ItemIndex > 0 then ParamByName('DATA').AsDateTime := Date;
+        Open;
+      end;
+
+  if Dm.IBQ_Pesquisa.RecordCount > 0 then
+    begin
+      AssignFile(Arq, 'c:\sgedu\relatorio.csv');
+      Rewrite (Arq);
+                                                                                                                                          
+      while not Dm.IBQ_Pesquisa.Eof do
+        begin
+          cnpj      := Dm.IBQ_Pesquisa.FieldByName('CPF_CNPJ').AsString;
+          nro       := Dm.IBQ_Pesquisa.FieldByName('NOSSO_NRO').AsString;
+          vencto    := Dm.IBQ_Pesquisa.FieldByName('DT_VENCTO').AsString;
+          vlr_parc  := Dm.IBQ_Pesquisa.FieldByName('VLR_PARC').AsString;
+          Writeln(Arq, cnpj,';', nro, ';', vencto, ';', vlr_parc + '.00');
+          Dm.IBQ_Pesquisa.Next;
+        end;
+
+      CloseFile(Arq);
+      ShowMessage('Relatório Gerado com Sucesso!');
+      Exit;
+    end
+  else
+    begin
+      ShowMessage('Nenhum Registro Encontrado!');
+    end;
+
+
+
+end;
+
+end.

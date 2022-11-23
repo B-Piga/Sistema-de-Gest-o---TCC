@@ -1,0 +1,202 @@
+object Sg_0000: TSg_0000
+  Left = 279
+  Top = 70
+  Align = alClient
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Sistema para Gerenciamento do Educand'#225'rio'
+  ClientHeight = 507
+  ClientWidth = 790
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  Menu = MainMenu1
+  OldCreateOrder = False
+  WindowState = wsMaximized
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Image1: TImage
+    Left = 0
+    Top = 0
+    Width = 789
+    Height = 501
+    Enabled = False
+    Stretch = True
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Top = 488
+    Width = 790
+    Height = 19
+    Panels = <
+      item
+        Width = 250
+      end
+      item
+        Width = 150
+      end
+      item
+        Width = 150
+      end
+      item
+        Text = ' BVX Tecnologia - fone: (14) 3372 9096'
+        Width = 150
+      end>
+  end
+  object MainMenu1: TMainMenu
+    Left = 32
+    Top = 56
+    object Cadastros1: TMenuItem
+      Caption = '&CADASTROS'
+      object AClientes1: TMenuItem
+        Caption = '&A - Associados'
+        OnClick = AClientes1Click
+      end
+    end
+    object ESTOQUES1: TMenuItem
+      Caption = 'RECEBER'
+      object EContasReceber1: TMenuItem
+        Caption = '&A - Contas Receber'
+        object Manuteno1: TMenuItem
+          Caption = 'Manuten'#231#227'o'
+          OnClick = Manuteno1Click
+        end
+        object Baixa1: TMenuItem
+          Caption = 'Baixa'
+          OnClick = Baixa1Click
+        end
+        object Relatrio1: TMenuItem
+          Caption = 'Relat'#243'rio'
+          OnClick = Relatrio1Click
+        end
+      end
+      object BBoletos1: TMenuItem
+        Caption = '&B - Boletos'
+        object GerarParcelas1: TMenuItem
+          Caption = 'Gerar Parcelas'
+          OnClick = GerarParcelas1Click
+        end
+        object GerarBoleto1: TMenuItem
+          Caption = 'Gerar Boleto'
+          OnClick = GerarBoleto1Click
+        end
+      end
+    end
+    object Sair1: TMenuItem
+      Caption = 'SAI&R'
+      object AFinalizarSistema1: TMenuItem
+        Caption = '&A - Finalizar Sistema'
+        OnClick = AFinalizarSistema1Click
+      end
+      object BNovoLogin1: TMenuItem
+        Caption = '&B - Novo Login'
+        OnClick = BNovoLogin1Click
+      end
+    end
+  end
+  object Timer1: TTimer
+    Interval = 100
+    OnTimer = Timer1Timer
+    Left = 32
+    Top = 86
+  end
+  object RDprint1: TRDprint
+    ImpressoraPersonalizada.NomeImpressora = 'Modelo Personalizado - (Epson)'
+    ImpressoraPersonalizada.AvancaOitavos = '27 48'
+    ImpressoraPersonalizada.AvancaSextos = '27 50'
+    ImpressoraPersonalizada.SaltoPagina = '12'
+    ImpressoraPersonalizada.TamanhoPagina = '27 67 66'
+    ImpressoraPersonalizada.Negrito = '27 69'
+    ImpressoraPersonalizada.Italico = '27 52'
+    ImpressoraPersonalizada.Sublinhado = '27 45 49'
+    ImpressoraPersonalizada.Expandido = '27 14'
+    ImpressoraPersonalizada.Normal10 = '18 27 80'
+    ImpressoraPersonalizada.Comprimir12 = '18 27 77'
+    ImpressoraPersonalizada.Comprimir17 = '27 80 27 15'
+    ImpressoraPersonalizada.Comprimir20 = '27 77 27 15'
+    ImpressoraPersonalizada.Reset = '27 80 18 20 27 53 27 70 27 45 48'
+    ImpressoraPersonalizada.Inicializar = '27 64'
+    OpcoesPreview.PaginaZebrada = False
+    OpcoesPreview.Remalina = False
+    OpcoesPreview.CaptionPreview = 'Rdprint Preview'
+    OpcoesPreview.PreviewZoom = 100
+    OpcoesPreview.CorPapelPreview = clWhite
+    OpcoesPreview.CorLetraPreview = clBlack
+    OpcoesPreview.Preview = False
+    OpcoesPreview.BotaoSetup = Ativo
+    OpcoesPreview.BotaoImprimir = Ativo
+    OpcoesPreview.BotaoGravar = Ativo
+    OpcoesPreview.BotaoLer = Ativo
+    OpcoesPreview.BotaoProcurar = Ativo
+    Margens.Left = 10
+    Margens.Right = 10
+    Margens.Top = 10
+    Margens.Bottom = 10
+    Autor = Deltress
+    RegistroUsuario.NomeRegistro = 'Bruno Ricardo Vuolo Mioto'
+    RegistroUsuario.SerieProduto = 'SINGLE-1206/01424'
+    RegistroUsuario.AutorizacaoKey = 'XFES-4296-DTCL-8633-URGJ'
+    About = 'RDprint 4.0d - Registrado'
+    Acentuacao = Transliterate
+    CaptionSetup = 'Rdprint Setup'
+    TitulodoRelatorio = 'Gerado por RDprint'
+    UsaGerenciadorImpr = True
+    CorForm = clBtnFace
+    CorFonte = clBlack
+    Impressora = Epson
+    Mapeamento.Strings = (
+      '//--- Grafico Compativel com Windows/USB ---//'
+      '//'
+      'GRAFICO=GRAFICO'
+      'HP=GRAFICO'
+      'DESKJET=GRAFICO'
+      'LASERJET=GRAFICO'
+      'INKJET=GRAFICO'
+      'STYLUS=GRAFICO'
+      'EPL=GRAFICO'
+      'USB=GRAFICO'
+      '//'
+      '//--- Linha Epson Matricial 9 e 24 agulhas ---//'
+      '//'
+      'GENERICO=EPSON'
+      'LX-810=EPSON'
+      'FX-2170=EPSON'
+      'FX-1170=EPSON'
+      'LQ-1170=EPSON'
+      'LQ-2170=EPSON'
+      'OKIDATA=EPSON'
+      '//'
+      '//--- Rima e Emilia ---//'
+      '//'
+      'RIMA=RIMA'
+      'EMILIA=RIMA'
+      '//'
+      '//--- Linha HP/Xerox padr'#227'o PCL ---//'
+      '//'
+      'PCL=HP'
+      '//'
+      '//--- Impressoras 40 Colunas ---//'
+      '//'
+      'DARUMA=BOBINA'
+      'SIGTRON=BOBINA'
+      'SWEDA=BOBINA'
+      'BEMATECH=BOBINA'
+      'EPSON=BOBINA'
+      'LX-300=BOBINA')
+    MostrarProgresso = True
+    TamanhoQteLinhas = 66
+    TamanhoQteColunas = 80
+    TamanhoQteLPP = Seis
+    NumerodeCopias = 1
+    FonteTamanhoPadrao = S10cpp
+    FonteEstiloPadrao = []
+    Orientacao = poPortrait
+    Left = 32
+    Top = 24
+  end
+end

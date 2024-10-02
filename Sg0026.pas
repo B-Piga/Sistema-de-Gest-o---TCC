@@ -23,29 +23,18 @@ type
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
-    Label8: TLabel;
-    Label11: TLabel;
     DBEdit_Nome: TDBEdit;
     DBEdit_Endereco: TDBEdit;
     DBEdit_bairro: TDBEdit;
-    DBEdit_cep: TDBEdit;
-    DBEdit_cnpj: TDBEdit;
-    Label1: TLabel;
-    DBEdit_nome_cid: TDBEdit;
-    DBEdit_uf_cid: TDBEdit;
-    Label14: TLabel;
-    DBEdit_observ: TDBEdit;
     DBEdit_NRO: TDBEdit;
     Label15: TLabel;
-    DBRG_tipo: TDBRadioGroup;
-    Label10: TLabel;
-    DBEdit_Complemento: TDBEdit;
-    Label17: TLabel;
     StatusBar1: TStatusBar;
     Panel1: TPanel;
     Label21: TLabel;
     DBT_codigo: TDBText;
     sSpeedButton1: TsSpeedButton;
+    Label2: TLabel;
+    DBEdit1: TDBEdit;
     procedure Ativa_Source;
     procedure Manutencao(Botao: Integer; Tabela: TIBDataSet);
     procedure Bbtn_IncluirClick(Sender: TObject);
@@ -56,10 +45,6 @@ type
     procedure StateChange(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormDestroy(Sender: TObject);
-    procedure DBRG_pessoaExit(Sender: TObject);
-    procedure DBEdit_cnpjKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
-    procedure DBEdit_dt_nascKeyPress(Sender: TObject; var Key: Char);
     procedure DBEdit_dt_nascEnter(Sender: TObject);
     procedure sSpeedButton1Click(Sender: TObject);
   private
@@ -330,136 +315,6 @@ begin
    Screen.OnActiveControlChange := Nil;
 end;
 
-procedure TSg_0026.DBRG_pessoaExit(Sender: TObject);
-begin
-   if (Trim(Copy(DBEdit_Cnpj.Text,1,1)) = '') and (Trim(Copy(DBEdit_insc_rg.Text,1,1)) = '') then
-     begin
-        if DBRG_pessoa.ItemIndex = 0 then // Pessoa Física
-          begin
-             Dm.IBDS_Socio.FieldByName('CPF_CNPJ').EditMask := '999.999.999-99;1';
-             Dm.IBDS_Socio.FieldByName('RG_IE').EditMask    := '99.999.999-c;1'; // 788 - 'c' Permite o uso de qualquer caracter para a posição
-          end
-        else
-          begin
-             Dm.IBDS_Socio.FieldByName('CPF_CNPJ').EditMask := '99.999.999/9999-99;1';
-             Dm.IBDS_Socio.FieldByName('RG_IE').EditMask    := '999.999.999.999;1';
-          end;
-    end;
-end;
-
-procedure TSg_0026.DBEdit_cnpjKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-var snum : String;
-begin
-   if key = vk_return then
-     begin
-        if DBRG_Pessoa.ItemIndex = 0 then
-          begin
-             // Tira os Pontos
-             snum := Copy(DBEdit_cnpj.Text,1,3) + Copy(DBEdit_cnpj.Text,5,3) + Copy(DBEdit_cnpj.Text,9,3) + Copy(DBEdit_cnpj.Text,13,2);
-
-             // Verifica se digitou
-             if Length(Trim(snum)) = 11 then
-               begin
-                  // Verifica se é Válido
-                  if cpf(snum) = False then
-                    begin
-                       ShowMessage('Este número de CPF não é válido!!!');
-                       DBEdit_cnpj.SetFocus;
-                       Exit;
-                    end
-                  else
-                    begin
-                       // Antes de Gravar, verifica se existe cadastro para esse CPF
-                       with Dm.IBQ_Pesquisa, sql do
-                         begin
-                            close;
-                            clear;
-                            add('select * from SOCIO where CPF_CNPJ = :cpf ');
-                            ParamByName('cpf').AsString := DBEdit_cnpj.Text;
-                            open;
-                         end;
-                       if Dm.IBQ_Pesquisa.RecordCount > 0 then
-                         begin
-                            if (Dm.IBDS_Socio.State <> dsInsert) and (Dm.IBQ_Pesquisa.FieldByName('CODIGO').AsInteger = StrToInt(DBT_Codigo.Caption)) then
-                               Exit;
-
-                            if Application.MessageBox('Já existe cadastro para esse CPF! Deseja Continuar?','Atenção',4) = MrNo then
-                               Bbtn_Cancelar.Click;
-                         end;
-                    end;
-               end
-             else
-               begin
-                  if Length(Trim(snum)) > 0 then
-                    begin
-                       ShowMessage('Este número de CPF não é válido!!!');
-                       DBEdit_cnpj.SetFocus;
-                       Exit;
-                    end;
-               end;
-          end
-        else
-          begin
-             // Tira os Pontos
-             snum := Copy(DBEdit_cnpj.Text,1,2) + Copy(DBEdit_cnpj.Text,4,3) + Copy(DBEdit_cnpj.Text,8,3) + Copy(DBEdit_cnpj.Text,12,4) + Copy(DBEdit_cnpj.Text,17,2);
-
-             // Verifica se digitou
-             if Length(Trim(snum)) = 14 then
-               begin
-                  // Verifica se é Válido
-                  if cnpj(snum) = False then
-                    begin
-                       ShowMessage('Este número de CNPJ não é válido!!!');
-                       DBEdit_cnpj.SetFocus;
-                       Exit;
-                    end
-                  else
-                    begin
-                       // Antes de Gravar, verifica se existe cadastro para esse CNPF
-                       with Dm.IBQ_Pesquisa, sql do
-                         begin
-                            close;
-                            clear;
-                            add('select * from SOCIO where CPF_CNPJ = :cpf ');
-                            ParamByName('cpf').AsString := DBEdit_cnpj.Text;
-                            open;
-                         end;
-                       if Dm.IBQ_Pesquisa.RecordCount > 0 then
-                         begin
-                            if (Dm.IBDS_Socio.State <> dsInsert) and (Dm.IBQ_Pesquisa.FieldByName('CODIGO').AsInteger = StrToInt(DBT_Codigo.Caption)) then
-                               Exit;
-
-                            if Application.MessageBox('Já existe cadastro para esse CNPJ! Deseja Continuar?','Atenção',4) = MrNo then
-                               Bbtn_Cancelar.Click;
-                         end;
-                    end;
-               end
-             else
-               begin
-                  if Length(Trim(snum)) > 0 then
-                    begin
-                       ShowMessage('Este número de CNPJ não é válido!!!');
-                       DBEdit_cnpj.SetFocus;
-                       Exit;
-                    end;
-               end;
-          end;
-     end;
-end;
-
-procedure TSg_0026.DBEdit_dt_nascKeyPress(Sender: TObject; var Key: Char);
-begin
-  if key = chr(8) then // BackSpace
-     begin
-        if DBEdit_DT_NASC.Text = '  /  /    ' then
-          begin
-             Dm.IBDS_SOCIO.FieldByName('DT_NASC').EditMask := '';
-             Dm.IBDS_SOCIO.FieldByName('DT_NASC').AsString := '';
-         end;
-     end;
-end;
-
 procedure TSg_0026.DBEdit_dt_nascEnter(Sender: TObject);
 begin
     Dm.IBDS_Socio.fieldByName('DT_NASC').EditMask := '99/99/9999;1';
@@ -468,55 +323,15 @@ end;
 procedure TSg_0026.Ativa_Source;
 begin
    DBT_codigo.DataField           := 'CODIGO';
-   DBT_codigo.DataSource          := Dm.DS_Socio;
-   DBEdit_Nome.DataSource         := Dm.DS_Socio;
+   DBT_codigo.DataSource          := Dm.DS_Produto;
+   DBEdit_Nome.DataSource         := Dm.DS_Produto;
    DBEdit_Nome.DataField          := 'NOME';
-   DBEdit_Dt_Nasc.DataSource      := Dm.DS_Socio;
-   DBEdit_Dt_Nasc.DataField       := 'DT_NASC';
-   DBEdit_Endereco.DataSource     := Dm.DS_Socio;
+   DBEdit_Endereco.DataSource     := Dm.DS_Produto;
    DBEdit_Endereco.DataField      := 'ENDERECO';
-   DBEdit_Nro.DataSource          := Dm.DS_Socio;
+   DBEdit_Nro.DataSource          := Dm.DS_Produto;
    DBEdit_Nro.DataField           := 'NRO';
-   DBEdit_Bairro.DataSource       := Dm.DS_Socio;
+   DBEdit_Bairro.DataSource       := Dm.DS_Produto;
    DBEdit_Bairro.DataField        := 'BAIRRO';
-   DBEdit_Nome_Cid.DataSource     := Dm.DS_Socio;
-   DBEdit_Nome_Cid.DataField      := 'CIDADE';
-   DBEdit_uf_Cid.DataSource       := Dm.DS_Socio;
-   DBEdit_uf_Cid.DataField        := 'UF';
-   DBEdit_CEP.DataSource          := Dm.DS_Socio;
-   DBEdit_CEP.DataField           := 'CEP';
-   DBEdit_Complemento.DataSource  := Dm.DS_Socio;
-   DBEdit_Complemento.DataField   := 'COMPLEMENTO';
-   DBEdit_Empresa.DataSource      := Dm.DS_Socio;
-   DBEdit_Empresa.DataField       := 'EMPRESA';
-   DBEdit_Profissao.DataSource    := Dm.DS_Socio;
-   DBEdit_Profissao.DataField     := 'PROFISSAO';
-   DBEdit_Fone.DataSource         := Dm.DS_Socio;
-   DBEdit_Fone.DataField          := 'FONE';
-   DBEdit_Fone1.DataSource        := Dm.DS_Socio;
-   DBEdit_Fone1.DataField         := 'FONE1';
-   DBEdit_Celular.DataSource      := Dm.DS_Socio;
-   DBEdit_Celular.DataField       := 'CELULAR';
-   DBEdit_Email.DataSource        := Dm.DS_Socio;
-   DBEdit_Email.DataField         := 'EMAIL';
-   DBEdit_CNPJ.DataSource         := Dm.DS_Socio;
-   DBEdit_CNPJ.DataField          := 'CPF_CNPJ';
-   DBEdit_INSC_RG.DataSource      := Dm.DS_Socio;
-   DBEdit_INSC_RG.DataField       := 'RG_IE';
-   DBEdit_INSC_RG.DataSource      := Dm.DS_Socio;
-   DBEdit_INSC_RG.DataField       := 'RG_IE';
-   DBEdit_Valor.DataSource        := Dm.DS_Socio;
-   DBEdit_Valor.DataField         := 'VALOR';
-   DBCB_Sexo.DataSource           := Dm.DS_Socio;
-   DBCB_Sexo.DataField            := 'SEXO';
-   DBRG_Pessoa.DataSource         := Dm.DS_Socio;
-   DBRG_Pessoa.DataField          := 'FLG_TIPO';
-   DBRG_Tipo.DataSource           := Dm.DS_Socio;
-   DBRG_Tipo.DataField            := 'FLG_ATIVO';
-   DBEdit_Observ.DataSource       := Dm.DS_Socio;
-   DBEdit_Observ.DataField        := 'OBSERV';
-   DBRG_boleto.DataSource         := Dm.DS_Socio;
-   DBRG_boleto.DataField          := 'FLG_BOLETO';
 end;
 
 end.

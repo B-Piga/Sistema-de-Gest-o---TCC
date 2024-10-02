@@ -37,6 +37,9 @@ type
     sSpeedButton3: TsSpeedButton;
     sSpeedButton4: TsSpeedButton;
     N2: TMenuItem;
+    C1: TMenuItem;
+    N3: TMenuItem;
+    N4: TMenuItem;
     procedure Acessa_Sistema;
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -50,6 +53,9 @@ type
     procedure GerarBoleto1Click(Sender: TObject);
     procedure GerarParcelas1Click(Sender: TObject);
     procedure N1Click(Sender: TObject);
+    procedure N2Click(Sender: TObject);
+    procedure N4Click(Sender: TObject);
+    procedure N3Click(Sender: TObject);
   private
     i, j : Integer;
   public
@@ -62,7 +68,7 @@ var
 implementation
 
 uses SgSen, Arquivos, Sg0020, Sg0022, Sg0021, Sg0022A,
-  Sg0023, Sg0024, Sg0025;
+  Sg0023, Sg0024, Sg0025, Sg0007, Sg0015, Sg0013;
 
 
 {$R *.dfm}
@@ -159,6 +165,27 @@ begin
    SG_0025 := TSG_0025.Create(Self);
    SG_0025.ShowModal;
    SG_0025.Destroy;
+end;
+
+procedure TSg_0000.N2Click(Sender: TObject);
+begin
+   SG_0007 := TSG_0020.Create(Self);
+   SG_0007.ShowModal;
+   SG_0007.Destroy;
+end;
+
+procedure TSg_0000.N3Click(Sender: TObject);
+begin
+   SG_0013 := TSG_0020.Create(Self);
+   SG_0013.ShowModal;
+   SG_0013.Destroy;
+end;
+
+procedure TSg_0000.N4Click(Sender: TObject);
+begin
+   SG_0015 := TSG_0020.Create(Self);
+   SG_0015.ShowModal;
+   SG_0015.Destroy;
 end;
 
 procedure TSg_0000.Baixa1Click(Sender: TObject);

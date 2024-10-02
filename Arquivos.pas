@@ -26,6 +26,10 @@ type
     DS_PesqFinanc: TDataSource;
     IBDS_Convenio: TIBDataSet;
     DS_Convenio: TDataSource;
+    IBDS_Produto: TIBDataSet;
+    DS_Produto: TDataSource;
+    IBDS_Movto: TIBDataSet;
+    DS_Movto: TDataSource;
     procedure DataModuleCreate(Sender: TObject);
     procedure IBQ_PesquisaAfterDelete(DataSet: TDataSet);
     procedure IBDS_ReceberAfterDelete(DataSet: TDataSet);

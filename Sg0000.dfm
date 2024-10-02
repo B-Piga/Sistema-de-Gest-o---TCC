@@ -3613,9 +3613,8 @@ object Sg_0000: TSg_0000
     Left = 0
     Top = 0
     Width = 221
-    Height = 369
-    Align = alCustom
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Height = 488
+    Align = alLeft
     AutoSize = True
     TabOrder = 1
     object sSpeedButton1: TsSpeedButton
@@ -5761,6 +5760,7 @@ object Sg_0000: TSg_0000
       end
       object N2: TMenuItem
         Caption = '&C - Produtos'
+        OnClick = N2Click
       end
     end
     object ESTOQUES1: TMenuItem
@@ -5801,6 +5801,17 @@ object Sg_0000: TSg_0000
       object BNovoLogin1: TMenuItem
         Caption = '&B - Novo Login'
         OnClick = BNovoLogin1Click
+      end
+    end
+    object C1: TMenuItem
+      Caption = '&GERENCIAL'
+      object N3: TMenuItem
+        Caption = '&A - Caixa'
+        OnClick = N3Click
+      end
+      object N4: TMenuItem
+        Caption = '&B - Vendas'
+        OnClick = N4Click
       end
     end
   end

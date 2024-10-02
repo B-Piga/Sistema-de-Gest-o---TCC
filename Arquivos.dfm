@@ -1,8 +1,8 @@
 object Dm: TDm
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Height = 330
-  Width = 414
+  Height = 456
+  Width = 507
   object IBD_SgEdu: TIBDatabase
     Connected = True
     DatabaseName = 'C:\BVX\SGEdu\SgEdu.fdb'
@@ -271,5 +271,72 @@ object Dm: TDm
     DataSet = IBDS_Convenio
     Left = 297
     Top = 263
+  end
+  object IBDS_Produto: TIBDataSet
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_PRODUTO ('#39'3'#39',:CODIGO, :NOME, :QTD_INICIAL, :' +
+        'QTD_ATUAL, :PRECO_CUSTO, :PRECO_VENDA, :DT_CADASTRO)')
+    InsertSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_PRODUTO ('#39'1'#39',:CODIGO, :NOME, :QTD_INICIAL, :' +
+        'QTD_ATUAL, :PRECO_CUSTO, :PRECO_VENDA, :DT_CADASTRO)')
+    RefreshSQL.Strings = (
+      'select * from produto '
+      'where (codigo = :codigo)')
+    SelectSQL.Strings = (
+      'select * from produto'
+      'where (codigo = :codigo)'
+      '')
+    ModifySQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_PRODUTO ('#39'2'#39',:CODIGO, :NOME, :QTD_INICIAL, :' +
+        'QTD_ATUAL, :PRECO_CUSTO, :PRECO_VENDA, :DT_CADASTRO)')
+    ParamCheck = True
+    UniDirectional = False
+    GeneratorField.Field = 'CODIGO'
+    Left = 35
+    Top = 258
+  end
+  object DS_Produto: TDataSource
+    AutoEdit = False
+    DataSet = IBDS_Produto
+    Left = 108
+    Top = 258
+  end
+  object IBDS_Movto: TIBDataSet
+    BufferChunks = 1000
+    CachedUpdates = False
+    DeleteSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_MOVTO ('#39'3'#39',:CODIGO, :dt_lancamento, :vlr_lan' +
+        'cado, :cod_prod, :observ)')
+    InsertSQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_MOVTO ('#39'1'#39',:CODIGO, :cod_caixa, :dt_lancamen' +
+        'to, :vlr_lancado, :flg_ent_sai, :observ, :cod_desp)')
+    RefreshSQL.Strings = (
+      'select a.* from MOVTO'
+      'where a.codigo = :codigo')
+    SelectSQL.Strings = (
+      'select a.* from MOVTO'
+      'where a.codigo = :codigo')
+    ModifySQL.Strings = (
+      
+        'EXECUTE PROCEDURE P_MOVTO ('#39'2'#39',:CODIGO, :cod_caixa, :dt_lancamen' +
+        'to, :vlr_lancado, :flg_ent_sai, :observ, :cod_desp)')
+    ParamCheck = True
+    UniDirectional = False
+    GeneratorField.Field = 'CODIGO'
+    Left = 36
+    Top = 320
+  end
+  object DS_Movto: TDataSource
+    AutoEdit = False
+    DataSet = IBDS_Movto
+    Left = 109
+    Top = 320
   end
 end

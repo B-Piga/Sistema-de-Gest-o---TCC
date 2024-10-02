@@ -1,0 +1,330 @@
+unit Sg0015;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, Grids, DBGrids, StdCtrls, Buttons, Mask, DBCtrls,
+  ComCtrls, DB, IBX.IBCustomDataSet, sLabel, sEdit, sButton, sCheckBox,
+  sRadioButton, sPanel, sBitBtn, sSpeedButton, IBX.IBQuery;
+
+type
+  TSg_0015 = class(TForm)
+    Panel1: TsPanel;
+    Pan_Botao: TsPanel;
+    Bbtn_Incluir: TsBitBtn;
+    Bbtn_Excluir: TsBitBtn;
+    Bbtn_Alterar: TsBitBtn;
+    Bbtn_Gravar: TsBitBtn;
+    Bbtn_Cancelar: TsBitBtn;
+    Bbtn_Imprimir: TsBitBtn;
+    Bbtn_Sair: TsBitBtn;
+    Bbtn_Pesquisar: TsBitBtn;
+    Bevel1: TBevel;
+    Pan_dados: TsPanel;
+    DBT_Codigo: TDBText;
+    Label2: TsLabel;
+    DBEdit_Descricao: TDBEdit;
+    Label1: TsLabel;
+    GB_Caixa: TGroupBox;
+    Label3: TsLabel;
+    Label4: TsLabel;
+    Label5: TsLabel;
+    GB_Despesa: TGroupBox;
+    SB_Despesa: TsSpeedButton;
+    DBEdit_CodDesp: TDBEdit;
+    DBEdit_NomeDesp: TDBEdit;
+    DBEdit_Valor: TDBEdit;
+    Edit_codigo: TEdit;
+    Edit_Data: TEdit;
+    Edit_Funcionario: TEdit;
+    IBQ_Pesquisa: TIBQuery;
+    DBCB_FormRec: TDBComboBox;
+    sLabel1: TsLabel;
+    procedure Manutencao(Botao: Integer; Tabela: TIBDataSet);
+    procedure Bbtn_IncluirClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure StateChange(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormDestroy(Sender: TObject);
+    procedure DBEdit_DescricaoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure DBEdit_CodDespEnter(Sender: TObject);
+    procedure SB_DespesaClick(Sender: TObject);
+  private
+    ComponAnt : TDBEdit;
+    procedure ControlChange(Sender : TObject);
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Sg_0015: TSg_0015;
+
+implementation
+
+uses Arquivos, Sg0000, Sg03, Sg04, Sg15, Sg16, Sg0026, Sg07;
+
+{$R *.dfm}
+
+
+procedure TSg_0015.ControlChange(Sender : TObject);
+begin
+   if Assigned(ComponAnt) then ComponAnt.color := clWhite;
+
+   if ActiveControl is TDBEdit then
+     begin
+        TDBEdit(ActiveControl).Color := $0080FFFF;
+        ComponAnt := TDBEdit(ActiveControl);
+     end
+   else
+     ComponAnt := nil;
+end;
+
+procedure TSg_0015.Manutencao(Botao: Integer; Tabela: TIBDataSet);
+var
+  cod : integer;
+begin
+  case Botao of
+    // Incluir
+    1 : begin
+      if (dm.nivel_acesso <> 1) then
+      begin
+        if (dm.nivel_acesso <> 3) then
+        ShowMessage('Você não tem permissão para isso!')
+      end
+        else
+      begin
+          if Dm.cod_caixa = 0 then
+            begin
+               ShowMessage('Usuário não possui Caixa Aberto!');
+               Exit;
+            end
+          else
+            begin
+               // Mostra Dados do Caixa Atual
+               Edit_Codigo.Text      := FormatFloat('000000',Dm.cod_caixa);
+               Edit_Data.Text        := Dm.data_caixa;
+               Edit_Funcionario.Text := Dm.nome_caixa;
+            end;
+
+          Tabela.Open;
+          Tabela.Append;
+          Tabela.FieldByName('CODIGO').AsInteger    := 0;
+          Tabela.FieldByName('FLG_ent_sai').AsString    := 'C';
+          Tabela.FieldByName('VLR_LANCADO').AsFloat       := 0;
+          Tabela.FieldByName('COD_CAIXA').AsInteger := Dm.cod_caixa;
+          if Dm.data_caixa = '' then
+             Tabela.FieldByName('dt_lancamento').AsDateTime := Date
+          else
+             Tabela.FieldByName('dt_lancamento').AsString   := Dm.data_caixa;
+
+          DBRG_Tipo.SetFocus;
+          Perform(wm_NextDlgCtl,0,0);
+        end;
+    end;
+    // Excluir
+    2 : begin
+           if (dm.nivel_acesso <> 1) then
+      begin
+        if (dm.nivel_acesso <> 3) then
+        ShowMessage('Você não tem permissão para isso!')
+      end
+        else
+        begin
+            if Tabela.RecordCount > 0 then
+            begin
+               if Application.MessageBox('Confirma Exclusão de Registro ??? ','Atenção',4) = MrYes then
+                 begin
+                    Tabela.Delete;
+                    Tabela.Close;
+                 end;
+            end;
+          Bbtn_Pesquisar.SetFocus;
+        end;
+    end;
+    // Alterar
+    3 : begin
+      if (dm.nivel_acesso <> 1) then
+      begin
+        if (dm.nivel_acesso <> 3) then
+        ShowMessage('Você não tem permissão para isso!')
+      end
+        else
+      begin
+          if Tabela.RecordCount > 0 then
+            begin
+               Tabela.Edit;
+               DBRG_Tipo.SetFocus;
+               Perform(wm_NextDlgCtl,0,0);
+            end;
+        end;
+    end;
+    //  Gravar
+    4 : begin
+          cod := StrToInt(DBT_Codigo.Caption);
+
+          Tabela.Post;
+          Tabela.Close;
+
+          if cod <> 0 then
+             Tabela.ParamByName('CODIGO').AsInteger := cod
+          else
+            begin
+               with Dm.IBQ_Pesquisa, sql do
+               begin
+                 close;
+                 clear;
+                 add('select max(codigo) cod from caixa_outros ');
+                 open;
+               end;
+               Tabela.ParamByName('CODIGO').AsInteger := Dm.IBQ_Pesquisa.FieldByName('COD').AsInteger;
+            end;
+
+          Tabela.Open;
+
+        end;
+    // Cancelar
+    5 : begin
+          Tabela.Cancel;
+          Tabela.Close;
+          Bbtn_Pesquisar.SetFocus
+        end;
+    // Imprimir
+    6 : begin
+           SG_0026 := TSG_0026.Create(Self);
+           SG_0026.ShowModal;
+           SG_0026.Destroy;
+        end;
+    // Pesquisa Lançamentos
+    7 : begin
+          Dlg_Outros.Edit_pesquisa.Clear;
+          if Dlg_Outros.ShowModal = mrOk then
+            begin
+               Dm.IBDS_Caixa_Outros.Close;
+               Dm.IBDS_Caixa_Outros.ParamByName('CODIGO').AsInteger := Dlg_Outros.SQL_Pesquisa.FieldByName('CODIGO').AsInteger;
+               Dm.IBDS_Caixa_Outros.Open;
+
+
+               // Mostra Caixa do Lançamento
+               Edit_Codigo.Text      := '';
+               Edit_Data.Text        := '';
+               Edit_Funcionario.Text := '';
+               if Dm.IBDS_Caixa_Outros.FieldByName('COD_CAIXA').AsString <> '' then
+                 begin
+                    with Dm.IBQ_Pesquisa, Sql do
+                      begin
+                         Close;
+                         Clear;
+                         Add('select a.codigo, a.dt_abertura, b.nome');
+                         Add('from caixa a, funcionario b where (a.cod_func = b.codigo) and (a.codigo = :caixa) ');
+                         ParamByName('caixa').AsInteger := Dm.IBDS_Caixa_Outros.FieldByName('COD_CAIXA').AsInteger;
+                         Open;
+                      end;
+
+                    Edit_Codigo.Text      := FormatFloat('000000',Dm.IBQ_Pesquisa.FieldByName('CODIGO').AsInteger);
+                    Edit_Data.Text        := Dm.IBQ_Pesquisa.FieldByName('DT_ABERTURA').AsString;
+                    Edit_Funcionario.Text := Dm.IBQ_Pesquisa.FieldByName('NOME').AsString;
+                 end;
+            end;
+        end;
+    // Finaliza Pesquisa
+    8 : begin
+          //99
+        end;
+    9 : Close;
+  end;
+end;
+
+procedure TSg_0015.Bbtn_IncluirClick(Sender: TObject);
+begin
+  Manutencao((Sender as TsBitBtn).Tag, Dm.IBDS_Caixa_Outros);
+end;
+
+procedure TSg_0015.FormShow(Sender: TObject);
+begin
+   Dm.DS_Caixa_Outros.OnStateChange   := StateChange;
+   Screen.OnActiveControlChange := ControlChange;
+
+   // Mostra Dados do Caixa
+   Edit_Codigo.Text      := FormatFloat('000000',Dm.cod_caixa);
+   Edit_Data.Text        := Dm.data_caixa;
+   Edit_Funcionario.Text := Dm.nome_caixa;
+
+   Bbtn_Pesquisar.SetFocus;
+end;
+
+procedure TSg_0015.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  if (Dm.DS_Caixa_Outros.State <> DsBrowse) and
+     (Dm.IBDS_Caixa_Outros.Active = True)   then
+     CanClose := False;
+end;
+
+procedure TSg_0015.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Shift = [ssAlt]) and (Key = VK_F4) then Key := VK_Clear;
+  if key = vk_return   then Perform(wm_NextDlgCtl,0,0);
+  if key = vk_escape   then Perform(wm_NextDlgCtl,1,0);
+end;
+
+procedure TSg_0015.StateChange(Sender: TObject);
+begin
+  Pan_dados.Enabled      :=     (Dm.DS_Caixa_Outros.State in [DSEDIT,DSINSERT]);
+  BBtn_Incluir.Enabled   := not (Dm.DS_Caixa_Outros.State in [DSINSERT,DSEDIT]);
+  BBtn_Excluir.Enabled   :=     (Dm.DS_Caixa_Outros.State in [DSBROWSE]);
+  BBtn_Alterar.Enabled   :=     (Dm.DS_Caixa_Outros.State in [DSBROWSE]);
+  BBtn_Gravar.Enabled    :=      Dm.DS_Caixa_Outros.State in [DSINSERT,DSEDIT];
+  BBtn_Cancelar.Enabled  :=      Dm.DS_Caixa_Outros.State in [DSINSERT,DSEDIT];
+
+  BBtn_imprimir.Enabled  := not (Dm.DS_Caixa_Outros.State in [DSINSERT,DSEDIT]);
+  BBtn_pesquisar.Enabled := not (Dm.DS_Caixa_Outros.State in [DSINSERT,DSEDIT]);
+  BBtn_sair.Enabled      := not (Dm.DS_Caixa_Outros.State in [DSINSERT,DSEDIT]);
+end;
+
+procedure TSg_0015.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Dm.DS_Caixa_Outros.OnStateChange := nil;
+  Dm.IBDS_Caixa_Outros.close;
+end;
+
+procedure TSg_0015.FormDestroy(Sender: TObject);
+begin
+   Screen.OnActiveControlChange := Nil;
+end;
+
+procedure TSg_0015.DBEdit_DescricaoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if key = vk_escape then
+      DBEdit_Valor.SetFocus;
+
+   if key = vk_return then
+      Bbtn_Gravar.SetFocus;
+end;
+
+procedure TSg_0015.DBEdit_CodDespEnter(Sender: TObject);
+begin
+   if DBEdit_CodDesp.Text = '' then
+      SB_Despesa.Click
+   else
+      Bbtn_Gravar.SetFocus;
+end;
+
+procedure TSg_0015.SB_DespesaClick(Sender: TObject);
+begin
+   Dlg_Produto.Edit_pesquisa.Clear;
+    if Dlg_Produto.ShowModal = mrOk then
+      begin
+        Dm.IBDS_Caixa_Outros.FieldByName('COD_DESP').AsInteger := Dlg_Produto.SQL_Pesquisa.FieldByName('CODIGO').AsInteger;
+        Dm.IBDS_Caixa_Outros.FieldByName('NOME_DESP').AsString := Dlg_Produto.SQL_Pesquisa.FieldByName('NOME').AsString;
+        Screen.OnActiveControlChange := ControlChange;
+      end;
+end;
+
+end.

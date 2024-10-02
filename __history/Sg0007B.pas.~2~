@@ -1,0 +1,233 @@
+unit Sg0007B;
+
+interface
+
+// Embaixo do 'Pan_Botao' existe um Edit que tem como função segurar o foco após o 'Gerar' ser clicado
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ExtCtrls, Grids, DBGrids, StdCtrls, Buttons, Mask, DBCtrls,
+  ComCtrls, DB, IBX.IBCustomDataSet, RDprint, IBX.IBQuery, sLabel, sEdit, sButton,
+  sCheckBox, sRadioButton, sPanel, sBitBtn, sSpeedButton;
+
+type
+  TSg_0007B = class(TForm)
+    Panel1: TsPanel;
+    Pan_Botao: TsPanel;
+    bbtn_gerar: TsBitBtn;
+    bbtn_sair: TsBitBtn;
+    Pan_dados: TsPanel;
+    GB_Intervalo: TGroupBox;
+    Label1: TsLabel;
+    Label2: TsLabel;
+    IBQ_Pesquisa: TIBQuery;
+    DS_Pesquisa: TDataSource;
+    Bevel2: TBevel;
+    Pan_Mens: TsPanel;
+    Label3: TsLabel;
+    Edit1: TsEdit;
+    GB_Produto: TGroupBox;
+    SB_Limpa_Prod: TsSpeedButton;
+    SB_Produto: TsSpeedButton;
+    Edit_CodProd: TsEdit;
+    Edit_NomeProd: TsEdit;
+    Edit_Codigo1: TsEdit;
+    Edit_Codigo2: TsEdit;
+    SB_Limpa_Cod: TsSpeedButton;
+    Pan_Tipo: TsPanel;
+    RG_Ordem: TRadioGroup;
+    Bevel1: TBevel;
+    CB_Est: TsCheckBox;
+    RDprint1: TRDprint;
+    Label4: TLabel;
+    procedure FormShow(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure FormDestroy(Sender: TObject);
+    procedure bbtn_sairClick(Sender: TObject);
+    procedure bbtn_gerarClick(Sender: TObject);
+    procedure SB_Limpa_ProdClick(Sender: TObject);
+    procedure SB_ProdutoClick(Sender: TObject);
+    procedure Edit_Codigo1KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure Edit_Codigo1KeyPress(Sender: TObject; var Key: Char);
+    procedure Edit_Codigo2KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure SB_Limpa_CodClick(Sender: TObject);
+  private
+    ComponAnt : TsEdit;
+    procedure ControlChange(Sender : TObject);
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Sg_0007B: TSg_0007B;
+
+implementation
+
+uses Arquivos, Sg0000, Sg07, R0032A;
+
+{$R *.dfm}
+
+procedure TSg_0007B.ControlChange(Sender : TObject);
+begin
+   if Assigned(ComponAnt) then ComponAnt.color  := clWhite;
+
+   if ActiveControl is TsEdit then
+     begin
+        TsEdit(ActiveControl).Color := $0080FFFF;
+        ComponAnt := TsEdit(ActiveControl);
+     end
+   else
+     ComponAnt := nil;
+end;
+
+procedure TSg_0007B.FormShow(Sender: TObject);
+begin
+   Screen.OnActiveControlChange := ControlChange;
+   SG_SenAx.bCorreto := False;
+
+   // Iniciliza Campos
+   SB_Limpa_Cod.Click;
+   SB_Limpa_Prod.Click;
+   Pan_Mens.Visible := False;
+   Edit_Codigo1.SetFocus;
+end;
+
+procedure TSg_0007B.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Shift = [ssAlt]) and (Key = VK_F4) then Key := VK_Clear;
+  if key = vk_return   then Perform(wm_NextDlgCtl,0,0);
+  if key = vk_escape   then Perform(wm_NextDlgCtl,1,0);
+  if key = vk_f6       then SB_Produto.Click;
+end;
+
+procedure TSg_0007B.FormDestroy(Sender: TObject);
+begin
+   Screen.OnActiveControlChange := Nil;
+end;
+
+procedure TSg_0007B.bbtn_sairClick(Sender: TObject);
+begin
+   Close;
+end;
+
+procedure TSg_0007B.bbtn_gerarClick(Sender: TObject);
+var sdt1, sdt2 : String;
+begin
+       // Muda Componentes
+       Edit1.SetFocus;
+       bbtn_gerar.Enabled := False;
+
+       // Mostra mensagem
+       Pan_Mens.Visible := True;
+       Application.ProcessMessages;
+
+
+       // Monta e Mostra Relatório
+       R_0032A := TR_0032A.Create(self);
+       with R_0032A.IBQ_Pesquisa,SQL do
+         begin
+            Close;
+            Clear;
+            Add('SELECT * FROM PRODUTO WHERE (CODIGO = CODIGO) ');
+            if Edit_Codigo1.Text  <> '' then Add('and (codigo between :cod1 and :cod2) ');
+            if Edit_NomeProd.Text <> '' then Add('and (nome like :prod) ');
+
+            if CB_Est.Checked = True    then Add('and (quant > 0) ');
+
+            if RG_Ordem.ItemIndex = 0   then Add('order by codigo ');
+            if RG_Ordem.ItemIndex = 1   then Add('order by nome ');
+
+            if Edit_Codigo1.Text <> '' then
+              begin
+                 ParamByName('COD1').AsInteger := StrToInt(Edit_Codigo1.Text);
+                 ParamByName('COD2').AsInteger := StrToInt(Edit_Codigo2.Text);
+              end;
+
+            if Edit_NomeProd.Text <> '' then ParamByName('PROD').AsString := Edit_NomeProd.Text + '%';
+            Open;
+         end;
+       R_0032A.QRLbl_Titulo.Caption := 'Relatório do Cadastro de Produtos';
+       if CB_Est.Checked = True then R_0032A.QRLbl_Titulo.Caption := R_0032A.QRLbl_Titulo.Caption + ' - Com Estoque';
+       R_0032A.Preview;
+       R_0032A.Destroy;
+
+
+       // Finaliza
+       Pan_Mens.Visible := False;
+       Application.ProcessMessages;
+       bbtn_gerar.Enabled := True;
+       bbtn_sair.SetFocus;
+end;
+
+procedure TSg_0007B.SB_Limpa_ProdClick(Sender: TObject);
+begin
+  Edit_CodProd.Text  := '';
+  Edit_NomeProd.Text := '';
+end;
+
+procedure TSg_0007B.SB_ProdutoClick(Sender: TObject);
+begin
+   Dlg_Produto.SB_Nova.Visible := True;
+   Dlg_Produto.Edit_pesquisa.Clear;
+   if Dlg_Produto.ShowModal = mrOk then
+     begin
+        Edit_CodProd.Text  := FormatFloat('000000',Dlg_Produto.SQL_Pesquisa.FieldByName('CODIGO').AsInteger);
+        Edit_NomeProd.Text := Dlg_Produto.SQL_Pesquisa.FieldByName('NOME').AsString;
+        Screen.OnActiveControlChange := ControlChange;
+     end;
+   bbtn_gerar.SetFocus;
+end;
+
+procedure TSg_0007B.Edit_Codigo1KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if key = vk_escape then bbtn_sair.SetFocus;
+
+   if key = vk_return then
+     begin
+        while Length(Edit_Codigo1.Text) < 6 do Edit_Codigo1.Text := '0' + Edit_Codigo1.Text;
+        Edit_Codigo2.SetFocus;
+     end;
+end;
+
+procedure TSg_0007B.Edit_Codigo1KeyPress(Sender: TObject; var Key: Char);
+begin
+   // Não permite digitar 'letra'
+   if (not (key in ['0'..'9'])) and (key <> chr(8)) then
+      key := chr(0);
+end;
+
+procedure TSg_0007B.Edit_Codigo2KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if key = vk_escape then Edit_Codigo1.SetFocus;
+
+   if key = vk_return then
+     begin
+        if Length(Edit_Codigo2.Text) > 0 then
+           while Length(Edit_Codigo2.Text) < 6 do Edit_Codigo2.Text := '0' + Edit_Codigo2.Text
+        else
+           Edit_Codigo2.Text := '999999';
+
+        if StrToInt(Edit_Codigo1.Text) > StrToInt(Edit_Codigo2.Text) then
+          begin
+             ShowMessage('Código Inicial não pode ser Maior que Código Final!');
+             Edit_Codigo1.SetFocus;
+          end
+        else
+          bbtn_gerar.SetFocus;
+     end;
+end;
+
+procedure TSg_0007B.SB_Limpa_CodClick(Sender: TObject);
+begin
+   Edit_Codigo1.Clear;
+   Edit_Codigo2.Clear;
+end;
+
+end.

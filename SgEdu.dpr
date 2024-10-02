@@ -19,7 +19,14 @@ uses
   Sgf0003p in 'Sgf0003p.pas' {Dlg_ccusto},
   Sgf0002p in 'Sgf0002p.pas' {Dlg_Conta},
   Sg21 in 'Sg21.pas' {Dlg_Empresa},
-  Sg0025 in 'Sg0025.pas' {Sg_0025};
+  Sg0025 in 'Sg0025.pas' {Sg_0025},
+  Sg0007 in 'Sg0007.pas' {Sg_0007},
+  Sg0007B in 'Sg0007B.pas' {Sg_0007B},
+  Sg07 in 'Sg07.pas' {Dlg_Produto},
+  Sg0013 in 'Sg0013.pas' {Sg_0013},
+  Sg0015 in 'Sg0015.pas' {Sg_0015},
+  Sg15 in 'Sg15.pas' {Dlg_Outros},
+  R0032A in 'R0032A.pas' {R_0032A: TQuickRep};
 
 {$R *.res}
 
@@ -44,5 +51,12 @@ begin
   Application.CreateForm(TDlg_Conta, Dlg_Conta);
   Application.CreateForm(TDlg_Empresa, Dlg_Empresa);
   Application.CreateForm(TSg_0025, Sg_0025);
+  Application.CreateForm(TSg_0007, Sg_0007);
+  Application.CreateForm(TSg_0007B, Sg_0007B);
+  Application.CreateForm(TDlg_Produto, Dlg_Produto);
+  Application.CreateForm(TSg_0013, Sg_0013);
+  Application.CreateForm(TSg_0015, Sg_0015);
+  Application.CreateForm(TDlg_Outros, Dlg_Outros);
+  Application.CreateForm(TR_0032A, R_0032A);
   Application.Run;
 end.

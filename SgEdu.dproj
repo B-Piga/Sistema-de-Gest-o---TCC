@@ -143,6 +143,35 @@
             <Form>Sg_0025</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Sg0007.pas">
+            <Form>Sg_0007</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Sg0007B.pas">
+            <Form>Sg_0007B</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Sg07.pas">
+            <Form>Dlg_Produto</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Sg0013.pas">
+            <Form>Sg_0013</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Sg0015.pas">
+            <Form>Sg_0015</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Sg15.pas">
+            <Form>Dlg_Outros</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="R0032A.pas">
+            <Form>R_0032A</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TQuickRep</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
